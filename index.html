@@ -627,13 +627,23 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+          "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+          "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.tsl.js"
         }
       }
     </script>
 
     <script type="module">
       import * as THREE from "three";
+      import {
+        uniform,
+        vec3,
+        normalize,
+        max,
+        pow,
+        mix,
+        positionWorld,
+      } from "three/tsl";
       /* ==========================================================================
      باران — چرخهٔ آب در طبیعت
      انیمیشن آموزشی سه‌بعدی · تک‌فایلی · Three.js
@@ -708,12 +718,12 @@
       let renderer;
 
       try {
-        renderer = new THREE.WebGLRenderer({
+        renderer = new THREE.WebGPURenderer({
           canvas,
           antialias: true,
           powerPreference: "high-performance",
-          stencil: false,
         });
+        await renderer.init();
       } catch (err) {
         showFatal();
         throw err;
@@ -727,6 +737,18 @@
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.0;
+      {
+        const b = document.createElement("div");
+        b.textContent =
+          renderer.backend && renderer.backend.isWebGPUBackend
+            ? "WebGPU"
+            : "WebGL2 (fallback)";
+        b.style.cssText =
+          "position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:9;padding:1px 10px;border-radius:99px;font:12px sans-serif;color:#fff;background:#0009;pointer-events:none";
+        document.body.appendChild(b);
+      }
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(
@@ -745,41 +767,43 @@
       const SKY_BOT_STORM = new THREE.Color(0x94a7bc);
 
       const skyUniforms = {
-        topColor: { value: SKY_TOP_CLEAR.clone() },
-        bottomColor: { value: SKY_BOT_CLEAR.clone() },
-        offset: { value: 26.0 },
-        exponent: { value: 0.78 },
+        topColor: uniform(SKY_TOP_CLEAR.clone()),
+        bottomColor: uniform(SKY_BOT_CLEAR.clone()),
       };
-
-      const skyMat = new THREE.ShaderMaterial({
-        uniforms: skyUniforms,
+      const skyMat = new THREE.MeshBasicNodeMaterial({
         side: THREE.BackSide,
         depthWrite: false,
-        vertexShader: /* glsl */ `
-      varying vec3 vWorldPosition;
-      void main() {
-        vec4 wp = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = wp.xyz;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-        fragmentShader: /* glsl */ `
-      uniform vec3 topColor;
-      uniform vec3 bottomColor;
-      uniform float offset;
-      uniform float exponent;
-      varying vec3 vWorldPosition;
-      void main() {
-        float h = normalize(vWorldPosition + vec3(0.0, offset, 0.0)).y;
-        float f = pow(max(h, 0.0), exponent);
-        gl_FragColor = vec4(mix(bottomColor, topColor, f), 1.0);
-      }
-    `,
+        fog: false,
+        toneMapped: false,
       });
+      skyMat.colorNode = mix(
+        skyUniforms.bottomColor,
+        skyUniforms.topColor,
+        pow(max(normalize(positionWorld.add(vec3(0, 26, 0))).y, 0), 0.78),
+      );
 
       const sky = new THREE.Mesh(new THREE.SphereGeometry(260, 32, 18), skyMat);
       sky.frustumCulled = false;
       scene.add(sky);
+      scene.fog = new THREE.FogExp2(0xd8f0ff, 0.0055);
+      {
+        const c = document.createElement("canvas");
+        c.width = 512;
+        c.height = 256;
+        const x = c.getContext("2d");
+        const g = x.createLinearGradient(0, 0, 0, 256);
+        g.addColorStop(0, "#2f86c9");
+        g.addColorStop(0.5, "#d8f0ff");
+        g.addColorStop(0.52, "#8fb7a6");
+        g.addColorStop(1, "#3f6f58");
+        x.fillStyle = g;
+        x.fillRect(0, 0, 512, 256);
+        const env = new THREE.CanvasTexture(c);
+        env.mapping = THREE.EquirectangularReflectionMapping;
+        env.colorSpace = THREE.SRGBColorSpace;
+        scene.environment = env;
+        scene.environmentIntensity = 0.7;
+      }
 
       /* ---------------------------------------------------------------------- */
       /* ۴) نورپردازی                                                            */
@@ -795,7 +819,7 @@
       const sunLight = new THREE.DirectionalLight(0xfff3d0, 1.6);
       sunLight.position.copy(SUN_POS);
       sunLight.castShadow = true;
-      sunLight.shadow.mapSize.set(1024, 1024);
+      sunLight.shadow.mapSize.set(2048, 2048);
       sunLight.shadow.camera.left = -26;
       sunLight.shadow.camera.right = 26;
       sunLight.shadow.camera.top = 26;
@@ -822,9 +846,9 @@
 
       const seaMat = new THREE.MeshStandardMaterial({
         color: SEA_CLEAR.clone(),
-        roughness: 0.42,
-        metalness: 0.08,
-        flatShading: true,
+        roughness: 0.12,
+        metalness: 0.1,
+        flatShading: false,
       });
 
       const sea = new THREE.Mesh(seaGeo, seaMat);
@@ -1078,7 +1102,7 @@
         color: CLOUD_WHITE.clone(),
         roughness: 1.0,
         metalness: 0.0,
-        flatShading: true,
+        flatShading: false,
       });
 
       const cloudGroup = new THREE.Group();
@@ -1132,52 +1156,35 @@
         vaporSize[i] = rnd(5.0, 11.0);
       }
 
-      const vaporGeo = new THREE.BufferGeometry();
-      vaporGeo.setAttribute(
-        "position",
-        new THREE.BufferAttribute(vaporPositions, 3),
-      );
-      vaporGeo.setAttribute("aAlpha", new THREE.BufferAttribute(vaporAlpha, 1));
-      vaporGeo.setAttribute("aSize", new THREE.BufferAttribute(vaporSize, 1));
-
-      const vaporUniforms = {
-        uOpacity: { value: 0 },
-        uColor: { value: new THREE.Color(0xe9f8ff) },
-      };
-
-      const vaporMat = new THREE.ShaderMaterial({
-        uniforms: vaporUniforms,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.NormalBlending,
-        vertexShader: /* glsl */ `
-      attribute float aAlpha;
-      attribute float aSize;
-      varying float vAlpha;
-      void main() {
-        vAlpha = aAlpha;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = aSize * (300.0 / max(-mv.z, 1.0));
-        gl_Position = projectionMatrix * mv;
+      const vaporUniforms = { uOpacity: { value: 0 } };
+      const vaporTex = (() => {
+        const c = document.createElement("canvas");
+        c.width = c.height = 64;
+        const x = c.getContext("2d");
+        const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+        g.addColorStop(0, "rgba(255,255,255,1)");
+        g.addColorStop(1, "rgba(255,255,255,0)");
+        x.fillStyle = g;
+        x.fillRect(0, 0, 64, 64);
+        const t = new THREE.CanvasTexture(c);
+        t.colorSpace = THREE.SRGBColorSpace;
+        return t;
+      })();
+      const vaporPoints = new THREE.Group();
+      const vaporSprites = [];
+      for (let i = 0; i < VAPOR_COUNT; i++) {
+        const m = new THREE.SpriteMaterial({
+          map: vaporTex,
+          color: 0xe9f8ff,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0,
+        });
+        const sp = new THREE.Sprite(m);
+        sp.scale.setScalar(vaporSize[i] * 0.28);
+        vaporPoints.add(sp);
+        vaporSprites.push(sp);
       }
-    `,
-        fragmentShader: /* glsl */ `
-      uniform float uOpacity;
-      uniform vec3 uColor;
-      varying float vAlpha;
-      void main() {
-        vec2 c = gl_PointCoord - vec2(0.5);
-        float d = length(c);
-        if (d > 0.5) discard;
-        float a = smoothstep(0.5, 0.12, d) * vAlpha * uOpacity;
-        if (a < 0.01) discard;
-        gl_FragColor = vec4(uColor, a);
-      }
-    `,
-      });
-
-      const vaporPoints = new THREE.Points(vaporGeo, vaporMat);
-      vaporPoints.frustumCulled = false;
       scene.add(vaporPoints);
 
       /* ---------------------------------------------------------------------- */
@@ -1524,8 +1531,8 @@
 
         /* ---------- نورها ---------- */
         sunLight.intensity = 1.6 * (1 - 0.62 * darkness);
-        hemi.intensity = 0.9 * (1 - 0.32 * darkness);
-        ambient.intensity = 0.3 * (1 - 0.28 * darkness);
+        hemi.intensity = 0.45 * (1 - 0.32 * darkness);
+        ambient.intensity = 0.15 * (1 - 0.28 * darkness);
         fillLight.intensity = 0.35 * (1 - 0.5 * darkness);
 
         /* ---------- آسمان ---------- */
@@ -1535,6 +1542,8 @@
         skyUniforms.bottomColor.value
           .copy(SKY_BOT_CLEAR)
           .lerp(SKY_BOT_STORM, darkness);
+        scene.fog.color.copy(skyUniforms.bottomColor.value);
+        scene.environmentIntensity = 0.7 * (1 - 0.4 * darkness);
 
         /* ---------- خورشید ---------- */
         sunMesh.scale.setScalar(sunPulse);
@@ -1578,14 +1587,10 @@
               d.oz * (1 - 0.86 * conv) +
               Math.cos(t * 1.1 + d.wobble) * 0.3 * (1 - conv);
 
-            vaporPositions[i * 3] = x;
-            vaporPositions[i * 3 + 1] = y;
-            vaporPositions[i * 3 + 2] = z;
-
-            vaporAlpha[i] = smooth(p, 0.0, 0.1) * (1 - smooth(p, 0.82, 1.0));
+            vaporSprites[i].position.set(x, y, z);
+            vaporSprites[i].material.opacity =
+              smooth(p, 0.0, 0.1) * (1 - smooth(p, 0.82, 1.0)) * vaporAmt * 0.7;
           }
-          vaporGeo.attributes.position.needsUpdate = true;
-          vaporGeo.attributes.aAlpha.needsUpdate = true;
         } else {
           vaporPoints.visible = false;
         }
@@ -1622,6 +1627,7 @@
           arr[i * 3 + 1] = waveHeight(x, z, t);
         }
         seaPosAttr.needsUpdate = true;
+        seaGeo.computeVertexNormals();
 
         /* ---------- موج‌های برخورد باران ---------- */
         for (let i = 0; i < ripples.length; i++) {
@@ -2165,7 +2171,7 @@
       }
 
       // بررسی بارگذاری موفق Three.js
-      if (typeof THREE === "undefined" || !THREE.WebGLRenderer) {
+      if (typeof THREE === "undefined" || !THREE.WebGPURenderer) {
         showFatal();
       } else {
         boot();
