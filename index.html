@@ -555,7 +555,7 @@
         <div class="brand">
           <span class="dot"></span> باران — چرخهٔ آب در طبیعت
         </div>
-        <div id="timer">۰ / ۴۰ ثانیه</div>
+        <div id="timer">۰ / ۱۲۰ ثانیه</div>
       </header>
 
       <div id="captionWrap">
@@ -585,17 +585,19 @@
     <!-- ================= START SCREEN ================= -->
     <div id="startScreen">
       <div class="card">
-        <h1>☔ باران</h1>
+        <h1>چرخهٔ آب</h1>
         <p class="lead">
-          چرخهٔ آب در طبیعت — یک انیمیشن آموزشی ۴۰ ثانیه‌ای<br />برای
-          دانش‌آموزان
+          شبیه‌سازی علمی چرخهٔ هیدرولوژیک و شکل‌گیری طوفان رعدوبرق — ۱۲۰ ثانیه
         </p>
         <ul class="steps">
-          <li>۱ · تبخیر</li>
-          <li>۲ · صعود و سرد شدن</li>
-          <li>۳ · میعان</li>
-          <li>۴ · بارش</li>
-          <li>۵ · جمع‌آوری</li>
+          <li>۱ · تابش خورشیدی</li>
+          <li>۲ · تبخیر</li>
+          <li>۳ · صعود و سرد شدن</li>
+          <li>۴ · میعان و تشکیل ابر</li>
+          <li>۵ · رشد ابر و طوفان</li>
+          <li>۶ · بارش</li>
+          <li>۷ · رواناب و نفوذ</li>
+          <li>۸ · بسته شدن چرخه</li>
         </ul>
         <button id="btnStart" class="btn primary big" type="button">
           ▶ شروع انیمیشن
@@ -603,7 +605,7 @@
         <p class="hint">
           برای چرخاندن صحنه، ماوس یا انگشت خود را بکشید · با چرخ ماوس یا دو
           انگشت، نزدیک و دور شوید<br />
-          روی ابر کلیک کنید تا واکنش نشان دهد ☁️
+          روی ابر کلیک کنید تا واکنش نشان دهد
         </p>
       </div>
     </div>
@@ -668,44 +670,56 @@
       /* ---------------------------------------------------------------------- */
       /* ۱) تنظیمات کلی و تایم‌لاین صحنه‌ها                                       */
       /* ---------------------------------------------------------------------- */
-      const DURATION = 40;
+      const DURATION = 120;
 
       const SCENES = [
         {
           s: 0,
-          e: 7,
-          title: "۱ · تبخیر",
-          text: "خورشید آب دریا را گرم می‌کند؛ آب به بخار تبدیل می‌شود و به آرامی بالا می‌رود.",
-        },
-        {
-          s: 7,
           e: 14,
-          title: "۲ · صعود و سرد شدن",
-          text: "بخار آب به آسمان می‌رود. هرچه بالاتر می‌رود، دمای هوا کمتر می‌شود.",
+          title: "۱ · تابش خورشیدی",
+          text: "انرژی تابشی خورشید سطح اقیانوس را گرم می‌کند. این گرما موتور اصلی چرخهٔ هیدرولوژیک است.",
         },
         {
           s: 14,
-          e: 22,
-          title: "۳ · میعان",
-          text: "بخارِ سردشده به قطره‌های بسیار ریز آب تبدیل می‌شود و با هم ابر را می‌سازند.",
-        },
-        {
-          s: 22,
           e: 30,
-          title: "۴ · بارش",
-          text: "قطره‌ها به هم می‌پیوندند و سنگین می‌شوند؛ ابر دیگر نمی‌تواند آن‌ها را نگه دارد و باران می‌بارد.",
+          title: "۲ · تبخیر",
+          text: "مولکول‌های آب با جذب گرمای نهان از سطح دریا جدا شده و به بخار تبدیل می‌شوند؛ نمک در دریا باقی می‌ماند.",
         },
         {
           s: 30,
-          e: 36,
-          title: "۵ · جمع‌آوری",
-          text: "آب باران روی زمین جاری می‌شود، در رودخانه جمع می‌شود و به دریا بازمی‌گردد.",
+          e: 46,
+          title: "۳ · صعود و سرد شدن",
+          text: "توده هوای مرطوب بالا می‌رود، منبسط می‌شود و به‌ازای هر کیلومتر ارتفاع حدود ۶ تا ۱۰ درجه سرد می‌شود.",
         },
         {
-          s: 36,
-          e: 40,
-          title: "چرخهٔ آب",
-          text: "و دوباره خورشید می‌تابد… چرخهٔ آب در طبیعت هرگز متوقف نمی‌شود.",
+          s: 46,
+          e: 64,
+          title: "۴ · میعان و تشکیل ابر",
+          text: "با رسیدن به نقطهٔ شبنم، بخار روی هسته‌های میعان مانند نمک و گرد و غبار به قطره‌های ریز تبدیل می‌شود و ابر شکل می‌گیرد.",
+        },
+        {
+          s: 64,
+          e: 80,
+          title: "۵ · رشد ابر و طوفان",
+          text: "جریان‌های صعودی قوی ابر را بلند می‌کنند، قطره‌ها درشت می‌شوند و بار الکتریکی جدا می‌شود؛ منشأ آذرخش همین است.",
+        },
+        {
+          s: 80,
+          e: 98,
+          title: "۶ · بارش",
+          text: "وقتی وزن قطره‌ها از نیروی جریان صعودی بیشتر شود، بارش آغاز می‌شود.",
+        },
+        {
+          s: 98,
+          e: 111,
+          title: "۷ · رواناب و نفوذ",
+          text: "بخشی از آب در خاک نفوذ می‌کند و بخشی به‌صورت رواناب در رودخانه جمع شده و به دریا بازمی‌گردد.",
+        },
+        {
+          s: 111,
+          e: 120,
+          title: "۸ · بسته شدن چرخه",
+          text: "آسمان باز می‌شود و تابش خورشید دوباره تبخیر را آغاز می‌کند؛ چرخهٔ آب پیوسته ادامه دارد.",
         },
       ];
 
@@ -761,10 +775,10 @@
       /* ---------------------------------------------------------------------- */
       /* ۳) آسمان (گرادیان شیدری)                                                */
       /* ---------------------------------------------------------------------- */
-      const SKY_TOP_CLEAR = new THREE.Color(0x2f86c9);
-      const SKY_TOP_STORM = new THREE.Color(0x3a4d68);
-      const SKY_BOT_CLEAR = new THREE.Color(0xd8f0ff);
-      const SKY_BOT_STORM = new THREE.Color(0x94a7bc);
+      const SKY_TOP_CLEAR = new THREE.Color(0x2e6aa8);
+      const SKY_TOP_STORM = new THREE.Color(0x232c38);
+      const SKY_BOT_CLEAR = new THREE.Color(0xb7cbdc);
+      const SKY_BOT_STORM = new THREE.Color(0x5f6b77);
 
       const skyUniforms = {
         topColor: uniform(SKY_TOP_CLEAR.clone()),
@@ -808,7 +822,7 @@
       /* ---------------------------------------------------------------------- */
       /* ۴) نورپردازی                                                            */
       /* ---------------------------------------------------------------------- */
-      const hemi = new THREE.HemisphereLight(0xc4ecff, 0x3f7a44, 0.9);
+      const hemi = new THREE.HemisphereLight(0xbcd0e0, 0x4a5a3a, 0.9);
       scene.add(hemi);
 
       const ambient = new THREE.AmbientLight(0xffffff, 0.3);
@@ -838,8 +852,8 @@
       /* ---------------------------------------------------------------------- */
       /* ۵) دریا                                                                 */
       /* ---------------------------------------------------------------------- */
-      const SEA_CLEAR = new THREE.Color(0x2c7fc0);
-      const SEA_STORM = new THREE.Color(0x1d5c8d);
+      const SEA_CLEAR = new THREE.Color(0x1b5575);
+      const SEA_STORM = new THREE.Color(0x0f2e3d);
 
       const seaGeo = new THREE.PlaneGeometry(150, 150, 32, 32);
       seaGeo.rotateX(-Math.PI / 2);
@@ -852,6 +866,44 @@
       });
 
       const sea = new THREE.Mesh(seaGeo, seaMat);
+      const seaNormal = (() => {
+        const S = 256,
+          c = document.createElement("canvas");
+        c.width = c.height = S;
+        const cx = c.getContext("2d"),
+          img = cx.createImageData(S, S);
+        const h = (u, v) => {
+          const a = u * Math.PI * 2,
+            b = v * Math.PI * 2;
+          return (
+            Math.sin(a * 3 + Math.sin(b * 2)) * 0.5 +
+            Math.sin(b * 5 + a * 2) * 0.3 +
+            Math.sin((a + b) * 7) * 0.15 +
+            Math.sin((a - b) * 11) * 0.07
+          );
+        };
+        for (let j = 0; j < S; j++)
+          for (let i = 0; i < S; i++) {
+            const u = i / S,
+              v = j / S,
+              e = 1 / S;
+            const nx = -(h(u + e, v) - h(u - e, v)) * 6,
+              ny = -(h(u, v + e) - h(u, v - e)) * 6,
+              l = Math.hypot(nx, ny, 1),
+              o = (j * S + i) * 4;
+            img.data[o] = ((nx / l) * 0.5 + 0.5) * 255;
+            img.data[o + 1] = ((ny / l) * 0.5 + 0.5) * 255;
+            img.data[o + 2] = ((1 / l) * 0.5 + 0.5) * 255;
+            img.data[o + 3] = 255;
+          }
+        cx.putImageData(img, 0, 0);
+        const t = new THREE.CanvasTexture(c);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(14, 14);
+        return t;
+      })();
+      seaMat.normalMap = seaNormal;
+      seaMat.normalScale.set(0.6, 0.6);
       sea.receiveShadow = true;
       scene.add(sea);
 
@@ -910,17 +962,33 @@
       const lathePts = ISLAND_PROFILE.map(
         ([r, y]) => new THREE.Vector2(Math.max(r, 0.001), y),
       );
-      const islandGeo = new THREE.LatheGeometry(lathePts, 30);
+      const islandGeo = new THREE.LatheGeometry(lathePts, 96);
+      (function roughen() {
+        const p = islandGeo.attributes.position;
+        const n = (x, z) =>
+          Math.sin(x * 0.9 + 1.3) * Math.cos(z * 0.8 - 0.7) +
+          0.5 * Math.sin(x * 2.1 + z * 1.7) +
+          0.25 * Math.sin(x * 4.3 - z * 3.9);
+        for (let i = 0; i < p.count; i++) {
+          const x = p.getX(i),
+            y = p.getY(i),
+            z = p.getZ(i);
+          if (y < 0.6) continue;
+          const k = 0.12 * n(x, z) * Math.min(1, y / 3);
+          p.setXYZ(i, x * (1 + k * 0.12), y + k * 0.9, z * (1 + k * 0.12));
+        }
+        islandGeo.computeVertexNormals();
+      })();
 
       // رنگ‌آمیزی رأس‌ها: ماسه در پایین، سبزه در بالا
       (function paintIsland() {
         const pos = islandGeo.attributes.position;
         const colors = new Float32Array(pos.count * 3);
 
-        const cGrass = new THREE.Color(0x74c96c);
-        const cGrassDark = new THREE.Color(0x4c9a52);
-        const cSand = new THREE.Color(0xe9d7a8);
-        const cSandDark = new THREE.Color(0xc7b085);
+        const cGrass = new THREE.Color(0x5d7a3a);
+        const cGrassDark = new THREE.Color(0x3b5230);
+        const cSand = new THREE.Color(0xb3a27c);
+        const cSandDark = new THREE.Color(0x8f8062);
         const tmp = new THREE.Color();
 
         for (let i = 0; i < pos.count; i++) {
@@ -941,7 +1009,7 @@
 
       const islandMat = new THREE.MeshStandardMaterial({
         vertexColors: true,
-        flatShading: true,
+        flatShading: false,
         roughness: 0.95,
         metalness: 0.0,
       });
@@ -955,24 +1023,24 @@
       /* ۷) درخت‌ها و صخره‌ها                                                     */
       /* ---------------------------------------------------------------------- */
       const trunkMat = new THREE.MeshStandardMaterial({
-        color: 0x8a5a34,
+        color: 0x4a3524,
         roughness: 1,
-        flatShading: true,
+        flatShading: false,
       });
       const leafMatA = new THREE.MeshStandardMaterial({
-        color: 0x3f8f4a,
+        color: 0x2c4a2a,
         roughness: 1,
-        flatShading: true,
+        flatShading: false,
       });
       const leafMatB = new THREE.MeshStandardMaterial({
-        color: 0x57a95c,
+        color: 0x3d5e32,
         roughness: 1,
-        flatShading: true,
+        flatShading: false,
       });
       const rockMat = new THREE.MeshStandardMaterial({
-        color: 0x8b96a3,
+        color: 0x6f747a,
         roughness: 1,
-        flatShading: true,
+        flatShading: false,
       });
 
       const trunkGeo = new THREE.CylinderGeometry(0.16, 0.24, 1.1, 6);
@@ -1049,7 +1117,7 @@
       /* ---------------------------------------------------------------------- */
       const sunMesh = new THREE.Mesh(
         new THREE.SphereGeometry(3.2, 24, 16),
-        new THREE.MeshBasicMaterial({ color: 0xffe066 }),
+        new THREE.MeshBasicMaterial({ color: 0xfff4dc }),
       );
       sunMesh.position.copy(SUN_POS);
       scene.add(sunMesh);
@@ -1068,10 +1136,10 @@
           size / 2,
           size / 2,
         );
-        g.addColorStop(0.0, "rgba(255,240,170,1)");
-        g.addColorStop(0.28, "rgba(255,220,110,0.62)");
-        g.addColorStop(0.62, "rgba(255,205,90,0.18)");
-        g.addColorStop(1.0, "rgba(255,200,80,0)");
+        g.addColorStop(0.0, "rgba(255,248,230,1)");
+        g.addColorStop(0.28, "rgba(255,240,205,0.5)");
+        g.addColorStop(0.62, "rgba(255,232,190,0.14)");
+        g.addColorStop(1.0, "rgba(255,225,180,0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, size, size);
         const tex = new THREE.CanvasTexture(c);
@@ -1095,8 +1163,8 @@
       /* ---------------------------------------------------------------------- */
       /* ۹) ابر                                                                 */
       /* ---------------------------------------------------------------------- */
-      const CLOUD_WHITE = new THREE.Color(0xffffff);
-      const CLOUD_DARK = new THREE.Color(0x76889c);
+      const CLOUD_WHITE = new THREE.Color(0xf1f4f7);
+      const CLOUD_DARK = new THREE.Color(0x3e464f);
 
       const cloudMat = new THREE.MeshStandardMaterial({
         color: CLOUD_WHITE.clone(),
@@ -1123,7 +1191,23 @@
 
       const blobs = [];
       BLOB_DEFS.forEach((d) => {
-        const geo = new THREE.IcosahedronGeometry(d.r, 1);
+        const geo = new THREE.IcosahedronGeometry(d.r, 3);
+        {
+          const p = geo.attributes.position,
+            nr = geo.attributes.normal;
+          for (let i = 0; i < p.count; i++) {
+            const x = p.getX(i),
+              y = p.getY(i),
+              z = p.getZ(i);
+            const k =
+              1 +
+              0.12 * Math.sin(x * 2.1 + y * 1.7) * Math.cos(z * 1.9 - x * 1.3) +
+              0.06 * Math.sin(x * 5 + z * 4);
+            p.setXYZ(i, x * k, y * k, z * k);
+            const l = Math.hypot(x, y, z) || 1;
+            nr.setXYZ(i, x / l, y / l, z / l);
+          }
+        }
         const m = new THREE.Mesh(geo, cloudMat);
         m.position.set(d.p[0], d.p[1], d.p[2]);
         m.scale.setScalar(0.001);
@@ -1512,27 +1596,37 @@
       /* ---------------------------------------------------------------------- */
       /* ۱۸) اعمال وضعیت تایم‌لاین روی صحنه (کاملاً قطعی)                          */
       /* ---------------------------------------------------------------------- */
+      const FLASH_COL = new THREE.Color(0xdfe8ff);
+      function lightning(t) {
+        const k = Math.floor(t / 2.3),
+          x = t - k * 2.3;
+        const h = Math.sin(k * 91.7 + 3.1) * 43758.5,
+          r = h - Math.floor(h);
+        if (r > 0.45 || t < 62 || t > 96) return 0;
+        return Math.exp(-x * 7) * (0.55 + 0.45 * Math.abs(Math.sin(x * 38)));
+      }
       function applyState(t) {
         /* ---------- فاکتورهای پایه ---------- */
-        const darkness = smooth(t, 19, 25.5) * (1 - smooth(t, 33.5, 38.5));
+        const darkness = smooth(t, 52, 70) * (1 - smooth(t, 100, 114));
         const rainAmt = clamp(
-          smooth(t, 22.5, 24.8) * (1 - smooth(t, 30, 33.5)) + pokeT * 0.35,
+          smooth(t, 78, 83) * (1 - smooth(t, 95, 100)) + pokeT * 0.35,
           0,
           1,
         );
         const vaporAmt = clamp(
-          smooth(t, 0.4, 3.5) * (1 - smooth(t, 16.5, 21)) +
-            0.6 * smooth(t, 36.5, 39.5),
+          smooth(t, 16, 24) * (1 - smooth(t, 50, 62)) +
+            0.6 * smooth(t, 110, 116),
           0,
           1,
         );
-        const riverAmt = smooth(t, 29.5, 33.5);
+        const riverAmt = smooth(t, 94, 104);
         const sunPulse = 1 + 0.055 * Math.sin(t * 2.4);
+        const fl = darkness > 0.45 ? lightning(t) * darkness : 0;
 
         /* ---------- نورها ---------- */
         sunLight.intensity = 1.6 * (1 - 0.62 * darkness);
-        hemi.intensity = 0.45 * (1 - 0.32 * darkness);
-        ambient.intensity = 0.15 * (1 - 0.28 * darkness);
+        hemi.intensity = 0.45 * (1 - 0.32 * darkness) + fl * 1.2;
+        ambient.intensity = 0.15 * (1 - 0.28 * darkness) + fl * 2.2;
         fillLight.intensity = 0.35 * (1 - 0.5 * darkness);
 
         /* ---------- آسمان ---------- */
@@ -1542,8 +1636,10 @@
         skyUniforms.bottomColor.value
           .copy(SKY_BOT_CLEAR)
           .lerp(SKY_BOT_STORM, darkness);
+        skyUniforms.topColor.value.lerp(FLASH_COL, fl * 0.5);
+        skyUniforms.bottomColor.value.lerp(FLASH_COL, fl * 0.4);
         scene.fog.color.copy(skyUniforms.bottomColor.value);
-        scene.environmentIntensity = 0.7 * (1 - 0.4 * darkness);
+        scene.environmentIntensity = 0.7 * (1 - 0.4 * darkness) + fl * 1.2;
 
         /* ---------- خورشید ---------- */
         sunMesh.scale.setScalar(sunPulse);
@@ -1552,12 +1648,14 @@
 
         /* ---------- دریا ---------- */
         seaMat.color.copy(SEA_CLEAR).lerp(SEA_STORM, darkness);
+        seaNormal.offset.set(t * 0.004, t * 0.0025);
+        seaNormal.updateMatrix();
 
         /* ---------- ابر ---------- */
         for (let i = 0; i < blobs.length; i++) {
           const b = blobs[i];
-          const start = 12 + i * 0.5;
-          const k = smooth(t, start, start + 3.4);
+          const start = 40 + i * 1.4;
+          const k = smooth(t, start, start + 9);
           b.visible = k > 0.012;
           b.scale.setScalar(Math.max(0.001, k));
           b.rotation.y = t * 0.05 * (i % 2 === 0 ? 1 : -1);
@@ -1859,7 +1957,7 @@
         if (hits.length > 0) {
           pokeT = 1.0;
           playBlip(620, 1040);
-          showToast("ابر تکان خورد! ☁️", 1200);
+          showToast("ابر تکان خورد!", 1200);
         }
       }
 
