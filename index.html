@@ -626,10 +626,26 @@
     </div>
 
     <!-- ================= IMPORT MAP ================= -->
+    <script>
+      addEventListener("error", function (e) {
+        var f = document.getElementById("fatal");
+        if (!f) return;
+        f.classList.add("show");
+        var b = f.querySelector(".box");
+        if (b && e.message)
+          b.insertAdjacentHTML(
+            "beforeend",
+            "<br><small dir=ltr>" +
+              String(e.message).replace(/</g, "&lt;") +
+              "</small>",
+          );
+      });
+    </script>
     <script type="importmap">
       {
         "imports": {
           "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+          "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
           "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.tsl.js"
         }
       }
